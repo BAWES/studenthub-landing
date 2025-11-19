@@ -4834,3 +4834,123 @@ figcaption {
   font-style: normal;
   font-display: swap;
 }
+
+/* === Custom override for mobile navbar toggle === */
+
+@media screen and (max-width: 991px) {
+  /* Hide menu by default on mobile */
+  .navbar .nav-menu-override {
+    display: none !important;
+  }
+
+  /* Show menu when JS adds .is-open */
+  .navbar .nav-menu-override.is-open {
+    display: block !important;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #ffffff;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .navbar .nav-menu-override.is-open .w-nav-link {
+    display: block;
+    padding: 0.4rem 0;
+  }
+}
+
+/* ===== Custom mobile nav override ===== */
+
+/* Default: desktop – show nav inline, hide hamburger */
+@media (min-width: 768px) {
+  .nav-menu-override {
+    display: flex !important;
+    align-items: center;
+    gap: 1.5rem;
+    position: static;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .custom-nav-button {
+    display: none !important;
+  }
+}
+
+/* Mobile: hide menu by default, show when .is-open is added */
+@media (max-width: 767px) {
+  .navigation-right {
+    position: relative;
+  }
+
+  .nav-menu-override {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #ffffff;
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    z-index: 1000;
+  }
+
+  .nav-menu-override.is-open {
+    display: flex;
+  }
+
+  .custom-nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+}
+
+/* === Custom nav link styles (manual edit – StudentHub) === */
+
+.nav-menu-override .nav-link {
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+/* === Custom nav CTA: Contact Us (StudentHub) === */
+.nav-menu-override .nav-link-contact {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  /* Make it look like the hero "Contact Us Now" button */
+  padding: 0.45rem 1.4rem !important;   /* was 1.8rem */
+  min-width: 110px !important;         /* was 130px */
+  width: auto !important;
+  height: auto !important;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  border-radius: 999px !important;
+  background-color: #000000 !important;
+  border: 1px solid #000000 !important;
+  color: #ffffff !important;
+  font-weight: 500;
+
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.20);
+}
+
+/* Small tweak for desktop spacing */
+@media (min-width: 768px) {
+  .nav-menu-override .nav-link-contact {
+    margin-left: 0.75rem;
+  }
+}
+
+/* Extra tweak for mobile – bit of top spacing */
+@media (max-width: 767px) {
+  .nav-menu-override .nav-link-contact {
+    margin-top: 0.35rem;
+  }
+}
