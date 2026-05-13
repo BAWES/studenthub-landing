@@ -109,6 +109,35 @@
     return closestLink && closestLink.href ? closestLink.href : '';
   }
 
+  function getSafeDestination(destination) {
+    var fallback = (destination || '').split(/[?#]/)[0];
+
+    if (!destination) {
+      return {
+        value: '',
+        queryPresent: false,
+        hashPresent: false
+      };
+    }
+
+    try {
+      var parsed = new URL(destination, window.location.href);
+      var isAbsolute = /^[a-z][a-z0-9+.-]*:/i.test(destination);
+
+      return {
+        value: isAbsolute ? parsed.origin + parsed.pathname : parsed.pathname,
+        queryPresent: !!parsed.search,
+        hashPresent: !!parsed.hash
+      };
+    } catch (error) {
+      return {
+        value: fallback,
+        queryPresent: destination.indexOf('?') !== -1,
+        hashPresent: destination.indexOf('#') !== -1
+      };
+    }
+  }
+
   function isExternal(destination) {
     if (!destination) return false;
 
@@ -158,6 +187,7 @@
 
         var pageNode = target.closest ? target.closest('[data-ph-page]') : null;
         var destination = getDestination(target);
+        var safeDestination = getSafeDestination(destination);
         var searchParams = new URLSearchParams(window.location.search);
 
         window.posthog.capture('landing cta clicked', {
@@ -167,7 +197,9 @@
           section: target.getAttribute('data-ph-section') || '',
           cta_key: target.getAttribute('data-ph-cta-key') || '',
           cta_text: getText(target),
-          destination: destination,
+          destination: safeDestination.value,
+          destination_query_present: safeDestination.queryPresent,
+          destination_hash_present: safeDestination.hashPresent,
           user_type_intent: target.getAttribute('data-ph-user-type-intent') || '',
           language: document.documentElement.lang || '',
           url_path: window.location.pathname,
