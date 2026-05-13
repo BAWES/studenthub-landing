@@ -115,6 +115,7 @@
     if (!destination) {
       return {
         value: '',
+        scheme: '',
         queryPresent: false,
         hashPresent: false
       };
@@ -123,15 +124,38 @@
     try {
       var parsed = new URL(destination, window.location.href);
       var isAbsolute = /^[a-z][a-z0-9+.-]*:/i.test(destination);
+      var scheme = isAbsolute ? parsed.protocol.replace(/:$/, '').toLowerCase() : '';
+
+      if (isAbsolute && scheme !== 'http' && scheme !== 'https') {
+        return {
+          value: scheme === 'mailto' || scheme === 'tel' || scheme === 'sms' || scheme === 'whatsapp' ? scheme + ':[redacted]' : 'non-http-url:[redacted]',
+          scheme: scheme || 'unknown',
+          queryPresent: !!parsed.search || destination.indexOf('?') !== -1,
+          hashPresent: !!parsed.hash || destination.indexOf('#') !== -1
+        };
+      }
 
       return {
         value: isAbsolute ? parsed.origin + parsed.pathname : parsed.pathname,
+        scheme: isAbsolute ? scheme : 'relative',
         queryPresent: !!parsed.search,
         hashPresent: !!parsed.hash
       };
     } catch (error) {
+      var schemeMatch = /^([a-z][a-z0-9+.-]*):/i.exec(destination);
+      var fallbackScheme = schemeMatch ? schemeMatch[1].toLowerCase() : '';
+      if (fallbackScheme && fallbackScheme !== 'http' && fallbackScheme !== 'https') {
+        return {
+          value: fallbackScheme === 'mailto' || fallbackScheme === 'tel' || fallbackScheme === 'sms' || fallbackScheme === 'whatsapp' ? fallbackScheme + ':[redacted]' : 'non-http-url:[redacted]',
+          scheme: fallbackScheme || 'unknown',
+          queryPresent: destination.indexOf('?') !== -1,
+          hashPresent: destination.indexOf('#') !== -1
+        };
+      }
+
       return {
         value: fallback,
+        scheme: fallbackScheme || 'unknown',
         queryPresent: destination.indexOf('?') !== -1,
         hashPresent: destination.indexOf('#') !== -1
       };
@@ -198,6 +222,7 @@
           cta_key: target.getAttribute('data-ph-cta-key') || '',
           cta_text: getText(target),
           destination: safeDestination.value,
+          destination_scheme: safeDestination.scheme,
           destination_query_present: safeDestination.queryPresent,
           destination_hash_present: safeDestination.hashPresent,
           user_type_intent: target.getAttribute('data-ph-user-type-intent') || '',
