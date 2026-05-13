@@ -24,32 +24,24 @@
   <link href="images/favicon.png" rel="shortcut icon" type="image/x-icon">
   <link href="images/webclip.png" rel="apple-touch-icon">
 
-  <!-- =====================================================
-       ANALYTICS BLOCK
-       UA kept for historical continuity.
-       GA4: replace G-REPLACE_ME with your Measurement ID.
-       PostHog: replace PHC_REPLACE_ME with your project API key.
-       ===================================================== -->
-
-  <!-- Google Analytics (UA — legacy, kept for continuity) -->
-  <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-64467043-1"></script>
+  <!-- Google Analytics (UA legacy + GA4) -->
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-RNM0FG5GKR"></script>
   <script type="text/javascript">
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'UA-64467043-1', {'anonymize_ip': false});
-    // GA4 — replace G-REPLACE_ME with your Measurement ID from analytics.google.com
-    gtag('config', 'G-REPLACE_ME');
+    gtag('config', 'G-RNM0FG5GKR');
   </script>
 
   <!-- Meta Pixel -->
   <script type="text/javascript">!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.agent='plwebflow';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init', '1023418231786230');fbq('track', 'PageView');</script>
 
-  <!-- PostHog — replace PHC_REPLACE_ME with your PostHog project API key -->
+  <!-- PostHog (EU cloud) -->
   <script>
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]);t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-    posthog.init('PHC_REPLACE_ME', {
-      api_host: 'https://us.i.posthog.com',
+    posthog.init('phc_sN2BiBuMpLRVZeyLiYh2xFcJa6rrw2er6axFCFgBLCmw', {
+      api_host: 'https://eu.i.posthog.com',
       session_recording: { maskAllInputs: false }
     });
   </script>
@@ -74,14 +66,11 @@
     })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
   </script>
   <script>
-    window.fwSettings={
-    'widget_id':84000002900
-    };
+    window.fwSettings={'widget_id':84000002900};
     !function(){if("function"!=typeof window.FreshworksWidget){var n=function(){n.q.push(arguments)};n.q=[],window.FreshworksWidget=n}}()
   </script>
   <script type="text/javascript" src="https://ind-widget.freshworks.com/widgets/84000002900.js" async="" defer=""></script>
   <meta name="facebook-domain-verification" content="5v1epkx2k3lxxr7e676mov062wm9u5">
-  <!--  respd  -->
   <script id="respondio__growth_tool" src="https://cdn.respond.io/widget/widget.js?wId=8bd7fd85-1183-4715-b9d6-27b279d89dc3"></script>
 </head>
 <body class="body">
@@ -105,7 +94,6 @@
           <div class="contact-form-heading-wrap">
             <h2 class="contact-heading">Contact us</h2>
           </div>
-          <!-- Google Form Embed -->
           <div class="contact-form w-form" style="position:relative;height:0;padding-bottom:1700px;overflow:hidden;">
             <iframe
               src="https://docs.google.com/forms/d/e/1FAIpQLScjweW2RQppH3TKOrNaPCjBYBpr9mBrywPQVTSwzmPXNMKdJg/viewform?embedded=true"
