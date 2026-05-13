@@ -23,6 +23,10 @@
     'utm_content',
     'utm_term'
   ];
+  var pageStartedAt = Date.now();
+  var maxScrollPercent = 0;
+  var pageLeftCaptured = false;
+  var heroViewedCaptured = false;
 
   // Custom analytics for explicit StudentHub CTA events.
   if (!POSTHOG_KEY || POSTHOG_KEY === 'POSTHOG_PROJECT_KEY_HERE') {
@@ -200,6 +204,151 @@
 
   function getUtmValue(searchParams, key) {
     return searchParams.get(key) || '';
+  }
+
+  function getPageName() {
+    var pageNode = document.querySelector ? document.querySelector('[data-ph-page]') : null;
+    if (pageNode && pageNode.getAttribute('data-ph-page')) return pageNode.getAttribute('data-ph-page');
+
+    var path = window.location.pathname || '';
+    if (!path || path === '/' || /\/index\.html$/i.test(path)) return 'home';
+    if (/\/contact\.html$/i.test(path)) return 'contact';
+
+    return path.replace(/^\//, '').replace(/\.html$/i, '') || 'unknown';
+  }
+
+  function getReferringDomain() {
+    if (!document.referrer) return '';
+
+    try {
+      return new URL(document.referrer).hostname;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function getSafePageProperties(extraProperties) {
+    var searchParams = new URLSearchParams(window.location.search);
+    var properties = {
+      product: 'studenthub',
+      app: 'studenthub-landing',
+      page: getPageName(),
+      url_path: window.location.pathname,
+      url_hash_present: !!window.location.hash,
+      utm_source: getUtmValue(searchParams, 'utm_source'),
+      utm_medium: getUtmValue(searchParams, 'utm_medium'),
+      utm_campaign: getUtmValue(searchParams, 'utm_campaign'),
+      utm_content: getUtmValue(searchParams, 'utm_content'),
+      utm_term: getUtmValue(searchParams, 'utm_term'),
+      referring_domain: getReferringDomain()
+    };
+
+    if (extraProperties) {
+      Object.keys(extraProperties).forEach(function (key) {
+        properties[key] = extraProperties[key];
+      });
+    }
+
+    return properties;
+  }
+
+  function updateMaxScrollPercent() {
+    try {
+      var element = document.documentElement;
+      var body = document.body;
+      var scrollTop = window.pageYOffset || element.scrollTop || (body && body.scrollTop) || 0;
+      var scrollHeight = Math.max(
+        element.scrollHeight,
+        body ? body.scrollHeight : 0,
+        element.offsetHeight,
+        body ? body.offsetHeight : 0,
+        element.clientHeight
+      );
+      var viewportHeight = window.innerHeight || element.clientHeight || 0;
+      var scrollableHeight = scrollHeight - viewportHeight;
+      var scrollPercent = scrollableHeight > 0 ? Math.round((scrollTop / scrollableHeight) * 100) : 100;
+
+      maxScrollPercent = Math.max(maxScrollPercent, Math.min(100, Math.max(0, scrollPercent)));
+    } catch (error) {
+      maxScrollPercent = Math.max(maxScrollPercent, 0);
+    }
+  }
+
+  function captureEvent(eventName, properties) {
+    try {
+      if (!window.posthog || !window.posthog.capture) return;
+      window.posthog.capture(eventName, properties);
+    } catch (error) {
+      if (window.console && window.console.warn) {
+        window.console.warn('PostHog event capture failed.', error);
+      }
+    }
+  }
+
+  function capturePageViewed() {
+    updateMaxScrollPercent();
+    captureEvent(
+      'landing page viewed',
+      getSafePageProperties({
+        max_scroll_percent: maxScrollPercent
+      })
+    );
+  }
+
+  function capturePageLeft() {
+    if (pageLeftCaptured) return;
+    pageLeftCaptured = true;
+    updateMaxScrollPercent();
+
+    captureEvent(
+      'landing page left',
+      getSafePageProperties({
+        time_on_page_seconds: Math.max(0, Math.round((Date.now() - pageStartedAt) / 1000)),
+        max_scroll_percent: maxScrollPercent
+      })
+    );
+  }
+
+  function captureHomepageHeroViewed() {
+    if (heroViewedCaptured || getPageName() !== 'home') return;
+    heroViewedCaptured = true;
+
+    captureEvent('homepage hero viewed', getSafePageProperties());
+  }
+
+  function observeHomepageHero() {
+    if (getPageName() !== 'home') return;
+
+    var hero = document.querySelector ? document.querySelector('.heading-jumbo') : null;
+    if (!hero || !window.IntersectionObserver) {
+      captureHomepageHeroViewed();
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+
+        captureHomepageHeroViewed();
+        observer.disconnect();
+      });
+    }, { threshold: 0.5 });
+
+    observer.observe(hero);
+  }
+
+  function initializeManualEvents() {
+    capturePageViewed();
+    observeHomepageHero();
+    window.addEventListener('scroll', updateMaxScrollPercent, { passive: true });
+    window.addEventListener('pagehide', capturePageLeft);
+    window.addEventListener('beforeunload', capturePageLeft);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeManualEvents);
+  } else {
+    initializeManualEvents();
   }
 
   document.addEventListener(
