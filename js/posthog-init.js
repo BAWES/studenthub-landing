@@ -79,9 +79,12 @@
         (e.__SV = 1));
     })(document, window.posthog || []);
 
+    // Autocapture is enabled for PostHog heatmaps. before_send still scrubs URL,
+    // referrer, query, and hash data before events are sent. Session recording
+    // stays disabled until a privacy and masking review is complete.
     window.posthog.init(POSTHOG_KEY, {
       api_host: POSTHOG_HOST,
-      autocapture: false,
+      autocapture: true,
       capture_pageview: false,
       disable_session_recording: true,
       property_denylist: RAW_URL_PROPERTY_KEYS,
